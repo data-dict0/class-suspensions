@@ -5106,6 +5106,7 @@
     <script>
       (() => {
         const scroller = scrollama();
+        let lastActiveStep = 1; // Track the last active step
 
         scroller
           .setup({
@@ -5115,13 +5116,25 @@
             debug: false,
           })
           .onStepEnter(function ({ element, index, direction }) {
+            lastActiveStep = index; // Update last active step
             const event = new CustomEvent('stepin', {
               detail: { direction: direction, index: index },
             });
             element.dispatchEvent(event);
           })
           .onStepExit(function ({ element, index, direction }) {
-            // Don't do anything on step exit - let onStepEnter handle everything
+            // When scrolling up from below the scrolly section,
+            // trigger the last step that was active
+            if (
+              direction === 'up' &&
+              index === 3 &&
+              !element.nextElementSibling
+            ) {
+              const event = new CustomEvent('stepin', {
+                detail: { direction: 'up' },
+              });
+              element.dispatchEvent(event);
+            }
           });
 
         window.addEventListener('resize', scroller.resize);
