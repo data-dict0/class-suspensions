@@ -5121,14 +5121,19 @@
             element.dispatchEvent(event);
           })
           .onStepExit(function ({ element, index, direction }) {
-            const event = new CustomEvent('stepout', {
-              detail: { direction: direction },
-            });
+            // When scrolling up and exiting a step, trigger the previous step
             if (direction === 'up' && element.previousElementSibling) {
               const event = new CustomEvent('stepin', {
-                detail: { direction: direction },
+                detail: { direction: 'up' },
               });
               element.previousElementSibling.dispatchEvent(event);
+            }
+            // When scrolling down and exiting the last step, keep showing the last image
+            if (direction === 'down' && !element.nextElementSibling) {
+              const event = new CustomEvent('stepin', {
+                detail: { direction: 'down' },
+              });
+              element.dispatchEvent(event);
             }
           });
 
@@ -5136,8 +5141,6 @@
       })();
 
       document.addEventListener('DOMContentLoaded', function () {
-        // JavaScript code here
-
         // Function to check if the device is a mobile device
         function isMobileDevice() {
           return (
@@ -5146,7 +5149,7 @@
           );
         }
 
-        // ADD THE INITIALIZATION CODE HERE:
+        // Set initial image on page load
         function setInitialImage() {
           let imagePath = isMobileDevice()
             ? './assets/step_1_mobile.png'
@@ -5154,39 +5157,42 @@
           d3.select('#scrolly-images img').attr('src', imagePath);
         }
 
-        // Set initial image on page load
         setInitialImage();
-
-        // Also update on window resize in case orientation changes
         window.addEventListener('resize', setInitialImage);
 
+        // Store current step for better state management
+        let currentStep = 1;
+
         d3.select('#step1').on('stepin', (e) => {
+          currentStep = 1;
           let imagePath = isMobileDevice()
             ? './assets/step_1_mobile.png'
             : './assets/step_1_image.png';
-          d3.select('#scrolly-images img').attr('src', imagePath); // Change image for step 1
+          d3.select('#scrolly-images img').attr('src', imagePath);
         });
 
         d3.select('#step2').on('stepin', (e) => {
+          currentStep = 2;
           let imagePath = isMobileDevice()
             ? './assets/step_2_mobile.png'
             : './assets/step_2_image.png';
-          d3.select('#scrolly-images img').attr('src', imagePath); // Change image for step 2
+          d3.select('#scrolly-images img').attr('src', imagePath);
         });
 
-        // For the section with fiery images
         d3.select('#step3').on('stepin', (e) => {
+          currentStep = 3;
           let imagePath = isMobileDevice()
             ? './assets/step_3_mobile.png'
             : './assets/step_3_image.png';
-          d3.select('#scrolly-images img').attr('src', imagePath); // Change image for step 3
+          d3.select('#scrolly-images img').attr('src', imagePath);
         });
 
         d3.select('#step4').on('stepin', (e) => {
+          currentStep = 4;
           let imagePath = isMobileDevice()
             ? './assets/step_4_mobile.png'
             : './assets/step_4_image.png';
-          d3.select('#scrolly-images img').attr('src', imagePath); // Change image for step 4
+          d3.select('#scrolly-images img').attr('src', imagePath);
         });
       });
     </script>
