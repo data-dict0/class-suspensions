@@ -5116,25 +5116,12 @@
           })
           .onStepEnter(function ({ element, index, direction }) {
             const event = new CustomEvent('stepin', {
-              detail: { direction: direction },
+              detail: { direction: direction, index: index },
             });
             element.dispatchEvent(event);
           })
           .onStepExit(function ({ element, index, direction }) {
-            // When scrolling up and exiting a step, trigger the previous step
-            if (direction === 'up' && element.previousElementSibling) {
-              const event = new CustomEvent('stepin', {
-                detail: { direction: 'up' },
-              });
-              element.previousElementSibling.dispatchEvent(event);
-            }
-            // When scrolling down and exiting the last step, keep showing the last image
-            if (direction === 'down' && !element.nextElementSibling) {
-              const event = new CustomEvent('stepin', {
-                detail: { direction: 'down' },
-              });
-              element.dispatchEvent(event);
-            }
+            // Don't do anything on step exit - let onStepEnter handle everything
           });
 
         window.addEventListener('resize', scroller.resize);
@@ -5160,11 +5147,7 @@
         setInitialImage();
         window.addEventListener('resize', setInitialImage);
 
-        // Store current step for better state management
-        let currentStep = 1;
-
         d3.select('#step1').on('stepin', (e) => {
-          currentStep = 1;
           let imagePath = isMobileDevice()
             ? './assets/step_1_mobile.png'
             : './assets/step_1_image.png';
@@ -5172,7 +5155,6 @@
         });
 
         d3.select('#step2').on('stepin', (e) => {
-          currentStep = 2;
           let imagePath = isMobileDevice()
             ? './assets/step_2_mobile.png'
             : './assets/step_2_image.png';
@@ -5180,7 +5162,6 @@
         });
 
         d3.select('#step3').on('stepin', (e) => {
-          currentStep = 3;
           let imagePath = isMobileDevice()
             ? './assets/step_3_mobile.png'
             : './assets/step_3_image.png';
@@ -5188,7 +5169,6 @@
         });
 
         d3.select('#step4').on('stepin', (e) => {
-          currentStep = 4;
           let imagePath = isMobileDevice()
             ? './assets/step_4_mobile.png'
             : './assets/step_4_image.png';
